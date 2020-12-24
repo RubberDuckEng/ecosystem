@@ -19,13 +19,17 @@ public class Prey : MonoBehaviour
     float m_fullness = 0.5f;
     Renderer m_renderer;
 
-    public float gatherSpeed = 4f;
-    public float wanderSpeed = 2f;
-    public float reproduceSpeed = 3f;
+    int planUpdatesPerSecond = 2;
 
-    public float reachDistance = 2f;
-    public float metabolism = 0.1f;
-    public float reproduceCost = 0.5f;
+    public float gatherSpeed;
+    public float wanderSpeed;
+    public float reproduceSpeed;
+
+    public float reachDistance;
+    [Range(0, 0.1f)]
+    public float metabolism;
+    [Range(0, 1)]
+    public float reproduceCost;
 
     Renderer m_planRenderer;
     static Color wanderColor = Color.blue;
@@ -33,10 +37,9 @@ public class Prey : MonoBehaviour
     static Color gatherColor = Color.green;
 
     [Range(0, 1)]
-    public float gatherThreshold = 0.5f;
-
+    public float gatherThreshold;
     [Range(0, 1)]
-    public float reproduceThreshold = 0.7f;
+    public float reproduceThreshold;
 
     public float sightRadius = 10;
 
@@ -70,6 +73,7 @@ public class Prey : MonoBehaviour
         GameObject closest = null;
         float distance = Mathf.Infinity;
         Vector3 position = transform.position;
+        float squaredSearchRadius = sightRadius * sightRadius;
         foreach (GameObject go in gos)
         {
             // Don't match ourselves.
@@ -78,7 +82,7 @@ public class Prey : MonoBehaviour
             Vector3 diff = go.transform.position - position;
             float curDistance = diff.sqrMagnitude;
 
-            if (curDistance > sightRadius) continue;
+            if (curDistance > squaredSearchRadius) continue;
 
             if (curDistance < distance)
             {
@@ -97,6 +101,11 @@ public class Prey : MonoBehaviour
 
     void PlanOnce()
     {
+        // I've seen Prey wander when hungry?  Unclear why.
+        // if (m_fullness < 0.4 && m_plan == Objective.Wander)
+        // {
+        //     Debug.Break();
+        // }
         if (m_fullness < gatherThreshold)
         {
             m_plan = Objective.Gather;
@@ -124,7 +133,7 @@ public class Prey : MonoBehaviour
         while (gameObject != null)
         {
             PlanOnce();
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(1.0f / planUpdatesPerSecond);
         }
     }
 

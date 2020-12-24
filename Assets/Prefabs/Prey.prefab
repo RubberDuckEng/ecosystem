@@ -206,9 +206,9 @@ MonoBehaviour:
   reproduceSpeed: 3
   reachDistance: 2
   metabolism: 0.05
-  reproduceCost: 0.5
+  reproduceCost: 0.4
   gatherThreshold: 0.5
-  reproduceThreshold: 0.7
-  sightRadius: 10
+  reproduceThreshold: 0.8
+  sightRadius: 20
   visionRadiusMaterial: {fileID: 2100000, guid: a09c2530ec2215f4b89723c6387a9bca,
     type: 2}
