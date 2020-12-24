@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4990712646858229789}
   m_Layer: 0
   m_Name: Prey
-  m_TagString: Untagged
+  m_TagString: Prey
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -106,4 +106,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d812cf66bc0695940bd682dbfb6a2f3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 2
+  gatherSpeed: 4
+  wanderSpeed: 2
+  reproduceSpeed: 3
+  reachDistance: 2
+  metabolism: 0.1
+  gatherThreshold: 0.5
+  reproduceThreshold: 0.7

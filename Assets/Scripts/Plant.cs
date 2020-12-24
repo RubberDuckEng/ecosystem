@@ -5,23 +5,15 @@ using UnityEngine;
 public class Plant : MonoBehaviour
 {
     public event System.Action OnDeath;
+    public float nutrition = 0.5f;
 
-    // Start is called before the first frame update
-    void Start()
+    public float Eat()
     {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    public void Eat() {
-        if (OnDeath != null) {
+        if (OnDeath != null)
+        {
             OnDeath();
         }
         Destroy(gameObject);
+        return nutrition;
     }
 }

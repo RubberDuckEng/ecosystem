@@ -24,20 +24,31 @@ public class Spawner : MonoBehaviour
     int foodLimit;
     float nextFoodSpawn;
 
-    void SpawnPrey()
+    void SpawnPreyAtRandomLocation()
     {
         Vector3 location = new Vector3(Random.value * mapSize - .5f * mapSize, 0, Random.value * mapSize - .5f * mapSize);
-        var food = Instantiate<GameObject>(preyPrefab, location, Quaternion.identity);
-        food.transform.parent = transform;
+        SpawnPrey(location);
     }
 
-    void SpawnFood()
+    void SpawnPrey(Vector3 location)
+    {
+        var prey = Instantiate<GameObject>(preyPrefab, location, Quaternion.identity);
+        prey.transform.parent = transform;
+        prey.GetComponent<Prey>().OnReproduce += PreyReproduced;
+    }
+
+    void SpawnFoodAtRandomLocation()
     {
         Vector3 location = new Vector3(Random.value * mapSize - .5f * mapSize, 0, Random.value * mapSize - .5f * mapSize);
         var food = Instantiate<GameObject>(foodPrefab, location, Quaternion.identity);
         food.transform.parent = transform;
         food.GetComponent<Plant>().OnDeath += PlantDied;
         foodCount++;
+    }
+
+    void PreyReproduced(GameObject parent)
+    {
+        SpawnPrey(parent.transform.position);
     }
 
     void PlantDied()
@@ -57,13 +68,13 @@ public class Spawner : MonoBehaviour
         int initalFood = CountFromDensity(initalFoodDensity);
         for (int i = 0; i < initalFood; i++)
         {
-            SpawnFood();
+            SpawnFoodAtRandomLocation();
         }
         foodLimit = CountFromDensity(maxFoodDensity);
 
         for (int i = 0; i < initalPrey; i++)
         {
-            SpawnPrey();
+            SpawnPreyAtRandomLocation();
         }
     }
 
@@ -72,7 +83,7 @@ public class Spawner : MonoBehaviour
     {
         if (nextFoodSpawn < Time.time && foodCount < foodLimit)
         {
-            SpawnFood();
+            SpawnFoodAtRandomLocation();
             float timeBetweenSpawns = 1f / foodPerSecond;
             nextFoodSpawn = Time.time + 0.5f * timeBetweenSpawns + Random.value * timeBetweenSpawns;
         }
