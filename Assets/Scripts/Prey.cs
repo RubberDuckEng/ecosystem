@@ -27,6 +27,11 @@ public class Prey : MonoBehaviour
     public float metabolism = 0.1f;
     public float reproduceCost = 0.5f;
 
+    Renderer m_planRenderer;
+    static Color wanderColor = Color.blue;
+    static Color reproduceColor = Color.red;
+    static Color gatherColor = Color.green;
+
     [Range(0, 1)]
     public float gatherThreshold = 0.5f;
 
@@ -40,7 +45,8 @@ public class Prey : MonoBehaviour
     {
         m_renderer = GetComponent<Renderer>();
         fullColor = m_renderer.material.color;
-        StartCoroutine(Plan());
+        StartCoroutine(PlanLoop());
+        m_planRenderer = transform.Find("Plan Indicator").GetComponent<Renderer>();
     }
 
     public GameObject FindClosestObjectWithTag(string tag)
@@ -72,30 +78,35 @@ public class Prey : MonoBehaviour
         return target;
     }
 
-    IEnumerator Plan()
+    void PlanOnce()
+    {
+        if (m_fullness < gatherThreshold)
+        {
+            m_plan = Objective.Gather;
+            m_targetObject = FindClosestObjectWithTag("Plant");
+        }
+        else if (m_fullness >= reproduceThreshold)
+        {
+            m_plan = Objective.Reproduce;
+            m_targetObject = FindClosestObjectWithTag("Prey");
+        }
+        else
+        {
+            m_targetObject = null;
+        }
+
+        if (m_targetObject == null)
+        {
+            m_plan = Objective.Wander;
+            m_targetLocation = NormalizeToCurrentHeight(transform.position + Random.onUnitSphere * gatherSpeed);
+        }
+    }
+
+    IEnumerator PlanLoop()
     {
         while (gameObject != null)
         {
-            if (m_fullness < gatherThreshold)
-            {
-                m_plan = Objective.Gather;
-                m_targetObject = FindClosestObjectWithTag("Plant");
-            }
-            else if (m_fullness >= reproduceThreshold)
-            {
-                m_plan = Objective.Reproduce;
-                m_targetObject = FindClosestObjectWithTag("Prey");
-            }
-            else
-            {
-                m_targetObject = null;
-            }
-
-            if (m_targetObject == null)
-            {
-                m_plan = Objective.Wander;
-                m_targetLocation = NormalizeToCurrentHeight(transform.position + Random.onUnitSphere * gatherSpeed);
-            }
+            PlanOnce();
             yield return new WaitForSeconds(1.0f);
         }
     }
@@ -118,6 +129,7 @@ public class Prey : MonoBehaviour
 
     void DoGatherUpdate()
     {
+        m_planRenderer.material.color = gatherColor;
         if (ChaseTargetObject())
         {
             Plant plant = m_targetObject.GetComponent<Plant>();
@@ -127,16 +139,18 @@ public class Prey : MonoBehaviour
 
     void DoWanderUpdate()
     {
+        m_planRenderer.material.color = wanderColor;
         transform.LookAt(m_targetLocation);
         transform.Translate(Vector3.forward * wanderSpeed * Time.deltaTime);
     }
 
     void DoReproduceUpdate()
     {
+        m_planRenderer.material.color = reproduceColor;
         if (ChaseTargetObject())
         {
             AdjustFullness(-reproduceCost);
-            Plan();
+            PlanOnce();
             if (OnReproduce != null)
             {
                 OnReproduce(gameObject);
