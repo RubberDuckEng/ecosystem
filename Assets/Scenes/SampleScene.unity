@@ -426,7 +426,7 @@ MonoBehaviour:
     type: 3}
   initalFoodDensity: 0.006
   maxFoodDensity: 0.084
-  foodPerSecond: 0.2
+  foodPerSecond: 0.6
 --- !u!4 &1071379058
 Transform:
   m_ObjectHideFlags: 0
