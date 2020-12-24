@@ -52,6 +52,9 @@ public class Prey : MonoBehaviour
         Vector3 position = transform.position;
         foreach (GameObject go in gos)
         {
+            // Don't match ourselves.
+            if (go == gameObject) continue;
+
             Vector3 diff = go.transform.position - position;
             float curDistance = diff.sqrMagnitude;
             if (curDistance < distance)
@@ -176,5 +179,6 @@ public class Prey : MonoBehaviour
                 DoReproduceUpdate();
                 break;
         }
+
     }
 }
