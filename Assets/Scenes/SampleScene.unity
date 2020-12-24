@@ -418,13 +418,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90de0c55ffe6a08418cdd181b4113982, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapSize: 30
+  mapSize: 50
   ground: {fileID: 430091331}
   foodPrefab: {fileID: 8581975904605421133, guid: 8c5e83193ac7b9a488c2de3988e146ba,
     type: 3}
   preyPrefab: {fileID: 4990712646858229786, guid: 50fef29920c15e74d950e00e0a9a6d38,
     type: 3}
-  initalFoodDensity: 0.006
+  initialFoodDensity: 0.02
   maxFoodDensity: 0.084
   foodPerSecond: 0.6
 --- !u!4 &1071379058

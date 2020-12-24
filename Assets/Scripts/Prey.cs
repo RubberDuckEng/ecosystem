@@ -38,18 +38,32 @@ public class Prey : MonoBehaviour
     [Range(0, 1)]
     public float reproduceThreshold = 0.7f;
 
+    public float sightRadius = 10;
+
     Color fullColor;
     Color deadColor = Color.red;
+
+    public Material visionRadiusMaterial;
+
+    void AddSightRadius()
+    {
+        var circle = new GameObject { name = "Planning Radius" };
+        circle.transform.parent = transform;
+        circle.transform.localPosition = Vector3.zero;
+        circle.DrawCircle(sightRadius, .1f);
+        circle.GetComponent<LineRenderer>().material = visionRadiusMaterial;
+    }
 
     void Start()
     {
         m_renderer = GetComponent<Renderer>();
         fullColor = m_renderer.material.color;
-        StartCoroutine(PlanLoop());
         m_planRenderer = transform.Find("Plan Indicator").GetComponent<Renderer>();
+        AddSightRadius();
+        StartCoroutine(PlanLoop());
     }
 
-    public GameObject FindClosestObjectWithTag(string tag)
+    public GameObject FindNearestVisibleObjectWithTag(string tag)
     {
         GameObject[] gos;
         gos = GameObject.FindGameObjectsWithTag(tag);
@@ -63,6 +77,9 @@ public class Prey : MonoBehaviour
 
             Vector3 diff = go.transform.position - position;
             float curDistance = diff.sqrMagnitude;
+
+            if (curDistance > sightRadius) continue;
+
             if (curDistance < distance)
             {
                 closest = go;
@@ -83,12 +100,12 @@ public class Prey : MonoBehaviour
         if (m_fullness < gatherThreshold)
         {
             m_plan = Objective.Gather;
-            m_targetObject = FindClosestObjectWithTag("Plant");
+            m_targetObject = FindNearestVisibleObjectWithTag("Plant");
         }
         else if (m_fullness >= reproduceThreshold)
         {
             m_plan = Objective.Reproduce;
-            m_targetObject = FindClosestObjectWithTag("Prey");
+            m_targetObject = FindNearestVisibleObjectWithTag("Prey");
         }
         else
         {

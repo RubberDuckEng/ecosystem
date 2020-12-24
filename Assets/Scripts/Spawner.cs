@@ -11,10 +11,10 @@ public class Spawner : MonoBehaviour
     public GameObject preyPrefab;
 
     [Min(0)]
-    int initalPrey = 10;
+    int initialPrey = 10;
 
     [Range(0, 1)]
-    public float initalFoodDensity = 0.05f;
+    public float initialFoodDensity = 0.02f;
     [Range(0, 1)]
     public float maxFoodDensity = 0.1f;
 
@@ -65,14 +65,14 @@ public class Spawner : MonoBehaviour
     void Start()
     {
         ground.localScale = new Vector3(mapSize, 1, mapSize);
-        int initalFood = CountFromDensity(initalFoodDensity);
-        for (int i = 0; i < initalFood; i++)
+        int initialFood = CountFromDensity(initialFoodDensity);
+        for (int i = 0; i < initialFood; i++)
         {
             SpawnFoodAtRandomLocation();
         }
         foodLimit = CountFromDensity(maxFoodDensity);
 
-        for (int i = 0; i < initalPrey; i++)
+        for (int i = 0; i < initialPrey; i++)
         {
             SpawnPreyAtRandomLocation();
         }
