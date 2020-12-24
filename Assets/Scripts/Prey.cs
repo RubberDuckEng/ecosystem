@@ -16,7 +16,7 @@ public class Prey : MonoBehaviour
     GameObject m_targetObject;
     Vector3 m_targetLocation;
     Objective m_plan = Objective.Wander;
-    float m_fullness = 0.5f;
+    float m_fullness;
     Renderer m_renderer;
 
     int planUpdatesPerSecond = 2;
@@ -41,6 +41,9 @@ public class Prey : MonoBehaviour
     [Range(0, 1)]
     public float reproduceThreshold;
 
+    [Min(1)]
+    public float wanderingness = 3.0f;
+
     public float sightRadius;
 
     float timeCanReproduceAfter;
@@ -62,6 +65,8 @@ public class Prey : MonoBehaviour
 
     void Start()
     {
+        m_targetLocation = transform.position;
+        m_fullness = 0.5f + Random.value * 0.5f;
         m_renderer = GetComponent<Renderer>();
         m_fullColor = m_renderer.material.color;
         m_planRenderer = transform.Find("Plan Indicator").GetComponent<Renderer>();
@@ -104,11 +109,15 @@ public class Prey : MonoBehaviour
 
     void PlanOnce()
     {
+        // Save this before we possibly try to reproduce/gather and fail.
+        bool planWasWander = m_plan == Objective.Wander;
+
         // I've seen Prey wander when hungry?  Unclear why.
         // if (m_fullness < 0.4 && m_plan == Objective.Wander)
         // {
         //     Debug.Break();
         // }
+
         if (m_fullness < gatherThreshold)
         {
             m_plan = Objective.Gather;
@@ -126,8 +135,15 @@ public class Prey : MonoBehaviour
 
         if (m_targetObject == null)
         {
+            float distance = (m_targetLocation - transform.position).magnitude;
+
+            // If we're starting a new wander, always pick a new location to wander to.
+            // If we're less than 1s away from our destination, we can change our minds.
+            if (distance < reachDistance || !planWasWander)
+            {
+                m_targetLocation = NormalizeToCurrentHeight(transform.position + Random.onUnitSphere * wanderSpeed * wanderingness);
+            }
             m_plan = Objective.Wander;
-            m_targetLocation = NormalizeToCurrentHeight(transform.position + Random.onUnitSphere * gatherSpeed);
         }
     }
 
@@ -168,6 +184,7 @@ public class Prey : MonoBehaviour
 
     void DoWanderUpdate()
     {
+        Debug.DrawRay(transform.position, m_targetLocation - transform.position);
         m_planRenderer.material.color = wanderColor;
         transform.LookAt(m_targetLocation);
         transform.Translate(Vector3.forward * wanderSpeed * Time.deltaTime);
@@ -203,7 +220,8 @@ public class Prey : MonoBehaviour
     void Update()
     {
         AdjustFullness(-metabolism * Time.deltaTime);
-        m_renderer.material.color = Color.Lerp(m_deadColor, m_fullColor, m_fullness);
+        // Only start lerping once below gather threshold.
+        m_renderer.material.color = Color.Lerp(m_deadColor, m_fullColor, m_fullness / gatherThreshold);
 
         if (m_fullness <= 0.0f)
         {
