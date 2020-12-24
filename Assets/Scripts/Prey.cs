@@ -41,10 +41,13 @@ public class Prey : MonoBehaviour
     [Range(0, 1)]
     public float reproduceThreshold;
 
-    public float sightRadius = 10;
+    public float sightRadius;
 
-    Color fullColor;
-    Color deadColor = Color.red;
+    float timeCanReproduceAfter;
+    public float reproduceCooldown;
+
+    Color m_fullColor;
+    Color m_deadColor = Color.black;
 
     public Material visionRadiusMaterial;
 
@@ -60,7 +63,7 @@ public class Prey : MonoBehaviour
     void Start()
     {
         m_renderer = GetComponent<Renderer>();
-        fullColor = m_renderer.material.color;
+        m_fullColor = m_renderer.material.color;
         m_planRenderer = transform.Find("Plan Indicator").GetComponent<Renderer>();
         AddSightRadius();
         StartCoroutine(PlanLoop());
@@ -111,7 +114,7 @@ public class Prey : MonoBehaviour
             m_plan = Objective.Gather;
             m_targetObject = FindNearestVisibleObjectWithTag("Plant");
         }
-        else if (m_fullness >= reproduceThreshold)
+        else if (m_fullness >= reproduceThreshold && Time.time > timeCanReproduceAfter)
         {
             m_plan = Objective.Reproduce;
             m_targetObject = FindNearestVisibleObjectWithTag("Prey");
@@ -176,6 +179,7 @@ public class Prey : MonoBehaviour
         if (ChaseTargetObject())
         {
             AdjustFullness(-reproduceCost);
+            timeCanReproduceAfter = Time.time + reproduceCooldown;
             PlanOnce();
             if (OnReproduce != null)
             {
@@ -199,7 +203,7 @@ public class Prey : MonoBehaviour
     void Update()
     {
         AdjustFullness(-metabolism * Time.deltaTime);
-        m_renderer.material.color = Color.Lerp(deadColor, fullColor, m_fullness);
+        m_renderer.material.color = Color.Lerp(m_deadColor, m_fullColor, m_fullness);
 
         if (m_fullness <= 0.0f)
         {
