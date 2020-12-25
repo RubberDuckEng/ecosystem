@@ -5,5 +5,13 @@ using UnityEngine;
 
 public class Prey : Animal
 {
+    void Start()
+    {
+        OnStart("Plant");
+    }
 
+    void Update()
+    {
+        OnUpdate();
+    }
 }

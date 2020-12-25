@@ -31,7 +31,9 @@ public class Animal : MonoBehaviour
     [Range(0, 1)]
     public float reproduceCost;
 
-    Renderer m_planRenderer;
+    string m_foodTag;
+
+    public Renderer planningIndicator;
     static Color wanderColor = Color.blue;
     static Color reproduceColor = Color.red;
     static Color gatherColor = Color.green;
@@ -63,13 +65,13 @@ public class Animal : MonoBehaviour
         circle.GetComponent<LineRenderer>().material = visionRadiusMaterial;
     }
 
-    void Start()
+    protected void OnStart(string foodTag)
     {
+        m_foodTag = foodTag;
         m_targetLocation = transform.position;
         m_fullness = 0.5f + Random.value * 0.5f;
         m_renderer = GetComponent<Renderer>();
         m_fullColor = m_renderer.material.color;
-        m_planRenderer = transform.Find("Plan Indicator").GetComponent<Renderer>();
         AddSightRadius();
         StartCoroutine(PlanLoop());
     }
@@ -121,12 +123,12 @@ public class Animal : MonoBehaviour
         if (m_fullness < gatherThreshold)
         {
             m_plan = Objective.Gather;
-            m_targetObject = FindNearestVisibleObjectWithTag("Plant");
+            m_targetObject = FindNearestVisibleObjectWithTag(m_foodTag);
         }
         else if (m_fullness >= reproduceThreshold && Time.time > timeCanReproduceAfter)
         {
             m_plan = Objective.Reproduce;
-            m_targetObject = FindNearestVisibleObjectWithTag("Prey");
+            m_targetObject = FindNearestVisibleObjectWithTag(tag);
         }
         else
         {
@@ -174,7 +176,7 @@ public class Animal : MonoBehaviour
 
     void DoGatherUpdate()
     {
-        m_planRenderer.material.color = gatherColor;
+        planningIndicator.material.color = gatherColor;
         if (ChaseTargetObject())
         {
             Plant plant = m_targetObject.GetComponent<Plant>();
@@ -185,14 +187,14 @@ public class Animal : MonoBehaviour
     void DoWanderUpdate()
     {
         Debug.DrawRay(transform.position, m_targetLocation - transform.position);
-        m_planRenderer.material.color = wanderColor;
+        planningIndicator.material.color = wanderColor;
         transform.LookAt(m_targetLocation);
         transform.Translate(Vector3.forward * wanderSpeed * Time.deltaTime);
     }
 
     void DoReproduceUpdate()
     {
-        m_planRenderer.material.color = reproduceColor;
+        planningIndicator.material.color = reproduceColor;
         if (ChaseTargetObject())
         {
             AdjustFullness(-reproduceCost);
@@ -216,8 +218,7 @@ public class Animal : MonoBehaviour
         Destroy(gameObject);
     }
 
-    // Update is called once per frame
-    void Update()
+    protected void OnUpdate()
     {
         AdjustFullness(-metabolism * Time.deltaTime);
         // Only start lerping once below gather threshold.

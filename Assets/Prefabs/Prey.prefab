@@ -207,6 +207,7 @@ MonoBehaviour:
   reachDistance: 2
   metabolism: 0.05
   reproduceCost: 0.4
+  planningIndicator: {fileID: 1912140479}
   gatherThreshold: 0.5
   reproduceThreshold: 0.8
   wanderingness: 5
