@@ -16,5 +16,15 @@ public class HUD : MonoBehaviour
         int predatorCount = GameObject.FindGameObjectsWithTag("Predator").Length;
 
         countText.text = $"Predators: {predatorCount}\nPrey: {preyCount}\nPlants: {plantCount}";
+
+
+        if (Input.GetKeyDown(KeyCode.Equals))
+        {
+            Time.timeScale *= 2f;
+        }
+        else if (Input.GetKeyDown(KeyCode.Minus))
+        {
+            Time.timeScale *= .5f;
+        }
     }
 }
