@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Plant
   - Prey
+  - Predator
   layers:
   - Default
   - TransparentFX
