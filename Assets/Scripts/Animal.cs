@@ -179,8 +179,8 @@ public class Animal : MonoBehaviour
         planningIndicator.material.color = gatherColor;
         if (ChaseTargetObject())
         {
-            Plant plant = m_targetObject.GetComponent<Plant>();
-            AdjustFullness(plant.Eat());
+            Edible food = m_targetObject.GetComponent<Edible>();
+            AdjustFullness(food.Eat());
         }
     }
 

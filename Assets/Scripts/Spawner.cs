@@ -9,9 +9,11 @@ public class Spawner : MonoBehaviour
     public Transform ground;
     public GameObject foodPrefab;
     public GameObject preyPrefab;
+    public GameObject predatorPrefab;
 
     [Min(0)]
     int initialPrey = 10;
+    int initialPredators = 4;
 
     [Range(0, 1)]
     public float initialFoodDensity = 0.02f;
@@ -37,13 +39,31 @@ public class Spawner : MonoBehaviour
         prey.GetComponent<Prey>().OnReproduce += PreyReproduced;
     }
 
+    void SpawnPredatorAtRandomLocation()
+    {
+        Vector3 location = new Vector3(Random.value * mapSize - .5f * mapSize, 0, Random.value * mapSize - .5f * mapSize);
+        SpawnPredator(location);
+    }
+
+    void SpawnPredator(Vector3 location)
+    {
+        var predator = Instantiate<GameObject>(predatorPrefab, location, Quaternion.identity);
+        predator.transform.parent = transform;
+        predator.GetComponent<Predator>().OnReproduce += PredatorReproduced;
+    }
+
     void SpawnFoodAtRandomLocation()
     {
         Vector3 location = new Vector3(Random.value * mapSize - .5f * mapSize, 0, Random.value * mapSize - .5f * mapSize);
         var food = Instantiate<GameObject>(foodPrefab, location, Quaternion.identity);
         food.transform.parent = transform;
-        food.GetComponent<Plant>().OnDeath += PlantDied;
+        food.GetComponent<Edible>().OnDeath += PlantDied;
         foodCount++;
+    }
+
+    void PredatorReproduced(GameObject parent)
+    {
+        SpawnPredator(parent.transform.position);
     }
 
     void PreyReproduced(GameObject parent)
@@ -61,7 +81,6 @@ public class Spawner : MonoBehaviour
         return Mathf.RoundToInt(density * mapSize * mapSize);
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         ground.localScale = new Vector3(mapSize, 1, mapSize);
@@ -76,9 +95,13 @@ public class Spawner : MonoBehaviour
         {
             SpawnPreyAtRandomLocation();
         }
+
+        for (int i = 0; i < initialPredators; i++)
+        {
+            SpawnPredatorAtRandomLocation();
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (nextFoodSpawn < Time.time && foodCount < foodLimit)

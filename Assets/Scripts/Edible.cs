@@ -4,15 +4,16 @@ using UnityEngine;
 
 public class Edible : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public event System.Action OnDeath;
+    public float nutrition = 0.5f;
 
-    // Update is called once per frame
-    void Update()
+    public float Eat()
     {
-        
+        if (OnDeath != null)
+        {
+            OnDeath();
+        }
+        Destroy(gameObject);
+        return nutrition;
     }
 }

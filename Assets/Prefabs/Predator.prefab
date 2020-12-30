@@ -106,11 +106,10 @@ GameObject:
   - component: {fileID: 4990712646858229791}
   - component: {fileID: 4990712646858229784}
   - component: {fileID: 4990712646858229785}
-  - component: {fileID: 4990712646858229789}
-  - component: {fileID: 8482394124276590133}
+  - component: {fileID: 2000392096359214508}
   m_Layer: 0
-  m_Name: Prey
-  m_TagString: Prey
+  m_Name: Predator
+  m_TagString: Predator
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -156,7 +155,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b3cbaef5e5987f74fb464a8426cb43a3, type: 2}
+  - {fileID: 2100000, guid: dbf54fc4a8d7af04c99321dbfa6fccb4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -190,7 +189,7 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &4990712646858229789
+--- !u!114 &2000392096359214508
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -199,33 +198,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 4990712646858229786}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d812cf66bc0695940bd682dbfb6a2f3b, type: 3}
+  m_Script: {fileID: 11500000, guid: 85beb99e7e0d28644a2f559134ef22fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gatherSpeed: 4
-  wanderSpeed: 2
-  reproduceSpeed: 3
-  reachDistance: 2
-  metabolism: 0.05
-  reproduceCost: 0.4
+  gatherSpeed: 2.01
+  wanderSpeed: 2.02
+  reproduceSpeed: 2.11
+  reachDistance: 2.13
+  metabolism: 0.0379
+  reproduceCost: 0.576
   planningIndicator: {fileID: 1912140479}
-  gatherThreshold: 0.5
-  reproduceThreshold: 0.8
-  wanderingness: 5
-  sightRadius: 20
-  reproduceCooldown: 10
+  gatherThreshold: 0.633
+  reproduceThreshold: 0.797
+  wanderingness: 3
+  sightRadius: 10.53
+  reproduceCooldown: 4.73
   visionRadiusMaterial: {fileID: 2100000, guid: a09c2530ec2215f4b89723c6387a9bca,
     type: 2}
---- !u!114 &8482394124276590133
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4990712646858229786}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5625ddc9976939a4f942731f15a1c2ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nutrition: 0.5
