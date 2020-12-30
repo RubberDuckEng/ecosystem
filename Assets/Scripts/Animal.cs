@@ -181,6 +181,7 @@ public class Animal : MonoBehaviour
         {
             Edible food = m_targetObject.GetComponent<Edible>();
             AdjustFullness(food.Eat());
+            SoundManager.PlaySound("eat");
         }
     }
 
