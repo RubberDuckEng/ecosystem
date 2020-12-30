@@ -6,7 +6,10 @@ public class Predator : Animal
 {
     void Start()
     {
-        OnStart("Prey");
+        AnimalConfig predator = new AnimalConfig();
+        predator.foodTag = "Prey";
+        predator.eatSoundName = "predator_eat";
+        OnStart(predator);
     }
 
     void Update()

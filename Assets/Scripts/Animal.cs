@@ -9,6 +9,13 @@ enum Objective
     Reproduce,
 }
 
+// FIXME: This should eventually be a ScriptableObject.
+public class AnimalConfig
+{
+    public string foodTag;
+    public string eatSoundName;
+}
+
 public class Animal : MonoBehaviour
 {
     public event System.Action<GameObject> OnReproduce;
@@ -31,7 +38,7 @@ public class Animal : MonoBehaviour
     [Range(0, 1)]
     public float reproduceCost;
 
-    string m_foodTag;
+    AnimalConfig m_config;
 
     public Renderer planningIndicator;
     static Color wanderColor = Color.blue;
@@ -65,9 +72,9 @@ public class Animal : MonoBehaviour
         circle.GetComponent<LineRenderer>().material = visionRadiusMaterial;
     }
 
-    protected void OnStart(string foodTag)
+    protected void OnStart(AnimalConfig config)
     {
-        m_foodTag = foodTag;
+        m_config = config;
         m_targetLocation = transform.position;
         m_fullness = 0.5f + Random.value * 0.5f;
         m_renderer = GetComponent<Renderer>();
@@ -123,7 +130,7 @@ public class Animal : MonoBehaviour
         if (m_fullness < gatherThreshold)
         {
             m_plan = Objective.Gather;
-            m_targetObject = FindNearestVisibleObjectWithTag(m_foodTag);
+            m_targetObject = FindNearestVisibleObjectWithTag(m_config.foodTag);
         }
         else if (m_fullness >= reproduceThreshold && Time.time > timeCanReproduceAfter)
         {
@@ -181,7 +188,8 @@ public class Animal : MonoBehaviour
         {
             Edible food = m_targetObject.GetComponent<Edible>();
             AdjustFullness(food.Eat());
-            SoundManager.PlaySound("eat");
+            if (m_config.eatSoundName != null)
+                SoundManager.PlaySound(m_config.eatSoundName);
         }
     }
 

@@ -1,3 +1,6 @@
 third_party/freesound/carrot.wav
 https://freesound.org/people/InspectorJ/sounds/412068/
 "Chewing, Carrot, A.wav" by InspectorJ (www.jshaw.co.uk) of Freesound.org
+
+third_party/freesound/meat.wav
+https://freesound.org/people/jgriffie919/sounds/400174/
