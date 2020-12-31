@@ -212,7 +212,8 @@ MonoBehaviour:
   gatherThreshold: 0.5
   reproduceThreshold: 0.8
   wanderingness: 5
-  sightRadius: 20
+  gatherSightRadius: 20
+  reproductionSightRadius: 20
   reproduceCooldown: 10
   visionRadiusMaterial: {fileID: 2100000, guid: a09c2530ec2215f4b89723c6387a9bca,
     type: 2}

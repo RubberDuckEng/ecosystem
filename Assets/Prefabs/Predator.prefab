@@ -203,15 +203,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gatherSpeed: 2.01
   wanderSpeed: 2.02
-  reproduceSpeed: 2.11
+  reproduceSpeed: 10
   reachDistance: 2.13
   metabolism: 0.0379
-  reproduceCost: 0.576
+  reproduceCost: 0.4
   planningIndicator: {fileID: 1912140479}
   gatherThreshold: 0.633
-  reproduceThreshold: 0.797
+  reproduceThreshold: 0.8
   wanderingness: 3
-  sightRadius: 10.53
-  reproduceCooldown: 4.73
+  gatherSightRadius: 3
+  reproductionSightRadius: 30
+  reproduceCooldown: 10
   visionRadiusMaterial: {fileID: 2100000, guid: a09c2530ec2215f4b89723c6387a9bca,
     type: 2}

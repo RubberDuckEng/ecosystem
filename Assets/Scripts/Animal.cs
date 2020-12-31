@@ -53,7 +53,8 @@ public class Animal : MonoBehaviour
     [Min(1)]
     public float wanderingness = 3.0f;
 
-    public float sightRadius;
+    public float gatherSightRadius;
+    public float reproductionSightRadius;
 
     float timeCanReproduceAfter;
     public float reproduceCooldown;
@@ -68,7 +69,7 @@ public class Animal : MonoBehaviour
         var circle = new GameObject { name = "Planning Radius" };
         circle.transform.parent = transform;
         circle.transform.localPosition = Vector3.zero;
-        circle.DrawCircle(sightRadius, .1f);
+        circle.DrawCircle(gatherSightRadius, .1f);
         circle.GetComponent<LineRenderer>().material = visionRadiusMaterial;
     }
 
@@ -79,18 +80,19 @@ public class Animal : MonoBehaviour
         m_fullness = 0.5f + Random.value * 0.5f;
         m_renderer = GetComponent<Renderer>();
         m_fullColor = m_renderer.material.color;
-        AddSightRadius();
+        // AddSightRadius();
+        timeCanReproduceAfter = Time.time + reproduceCooldown;
         StartCoroutine(PlanLoop());
     }
 
-    public GameObject FindNearestVisibleObjectWithTag(string tag)
+    public GameObject FindNearestVisibleObjectWithTag(string tag, float radius)
     {
         GameObject[] gos;
         gos = GameObject.FindGameObjectsWithTag(tag);
         GameObject closest = null;
         float distance = Mathf.Infinity;
         Vector3 position = transform.position;
-        float squaredSearchRadius = sightRadius * sightRadius;
+        float squaredSearchRadius = radius * radius;
         foreach (GameObject go in gos)
         {
             // Don't match ourselves.
@@ -130,12 +132,12 @@ public class Animal : MonoBehaviour
         if (m_fullness < gatherThreshold)
         {
             m_plan = Objective.Gather;
-            m_targetObject = FindNearestVisibleObjectWithTag(m_config.foodTag);
+            m_targetObject = FindNearestVisibleObjectWithTag(m_config.foodTag, gatherSightRadius);
         }
         else if (m_fullness >= reproduceThreshold && Time.time > timeCanReproduceAfter)
         {
             m_plan = Objective.Reproduce;
-            m_targetObject = FindNearestVisibleObjectWithTag(tag);
+            m_targetObject = FindNearestVisibleObjectWithTag(tag, reproductionSightRadius);
         }
         else
         {

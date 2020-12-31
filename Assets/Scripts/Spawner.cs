@@ -12,8 +12,8 @@ public class Spawner : MonoBehaviour
     public GameObject predatorPrefab;
 
     [Min(0)]
-    int initialPrey = 10;
-    int initialPredators = 4;
+    public int initialPrey;
+    public int initialPredators;
 
     [Range(0, 1)]
     public float initialFoodDensity = 0.02f;
