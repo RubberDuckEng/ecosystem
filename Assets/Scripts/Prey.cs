@@ -10,6 +10,7 @@ public class Prey : Animal
         AnimalConfig prey = new AnimalConfig();
         prey.foodTag = "Plant";
         prey.eatSoundName = "prey_eat";
+        prey.fleeFromTag = "Predator";
         OnStart(prey);
     }
 

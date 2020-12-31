@@ -205,6 +205,7 @@ MonoBehaviour:
   gatherSpeed: 4
   wanderSpeed: 2
   reproduceSpeed: 3
+  fleeSpeed: 4
   reachDistance: 2
   metabolism: 0.05
   reproduceCost: 0.4
@@ -214,6 +215,7 @@ MonoBehaviour:
   wanderingness: 5
   gatherSightRadius: 20
   reproductionSightRadius: 20
+  fleeSightRadius: 3
   reproduceCooldown: 10
   visionRadiusMaterial: {fileID: 2100000, guid: a09c2530ec2215f4b89723c6387a9bca,
     type: 2}

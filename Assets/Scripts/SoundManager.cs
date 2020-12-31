@@ -16,6 +16,7 @@ public class SoundManager : MonoBehaviour
 
     public static void PlaySound(string name)
     {
+        if (!User.playSounds) return;
         switch (name)
         {
             case "prey_eat":

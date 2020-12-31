@@ -16,32 +16,5 @@ public class HUD : MonoBehaviour
         int predatorCount = GameObject.FindGameObjectsWithTag("Predator").Length;
 
         countText.text = $"Predators: {predatorCount}\nPrey: {preyCount}\nPlants: {plantCount}";
-
-
-        // Probably should be a separate Object?
-        if (Input.GetKeyDown(KeyCode.Equals))
-        {
-            Time.timeScale *= 2f;
-        }
-        else if (Input.GetKeyDown(KeyCode.Minus))
-        {
-            Time.timeScale *= .5f;
-        }
-        else if (Input.GetKeyDown(KeyCode.S))
-        {
-            Smite();
-        }
-
-    }
-
-    void Smite()
-    {
-        foreach (var gameObject in GameObject.FindGameObjectsWithTag("Prey"))
-        {
-            if (Random.value > 0.5)
-            {
-                gameObject.GetComponent<Edible>().Eat();
-            }
-        }
     }
 }

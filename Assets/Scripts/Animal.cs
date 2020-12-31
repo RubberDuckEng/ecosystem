@@ -7,6 +7,7 @@ enum Objective
     Wander,
     Gather,
     Reproduce,
+    Flee,
 }
 
 // FIXME: This should eventually be a ScriptableObject.
@@ -14,6 +15,7 @@ public class AnimalConfig
 {
     public string foodTag;
     public string eatSoundName;
+    public string fleeFromTag;
 }
 
 public class Animal : MonoBehaviour
@@ -31,6 +33,7 @@ public class Animal : MonoBehaviour
     public float gatherSpeed;
     public float wanderSpeed;
     public float reproduceSpeed;
+    public float fleeSpeed;
 
     public float reachDistance;
     [Range(0, 0.1f)]
@@ -41,9 +44,11 @@ public class Animal : MonoBehaviour
     AnimalConfig m_config;
 
     public Renderer planningIndicator;
-    static Color wanderColor = Color.blue;
-    static Color reproduceColor = Color.red;
-    static Color gatherColor = Color.green;
+    // https://coolors.co/f2ff49-ff4242-fb62f6-645dd7-b3fffc
+    static Color wanderColor = new Color32(100, 93, 215, 255);
+    static Color reproduceColor = new Color32(251, 98, 246, 255);
+    static Color gatherColor = new Color32(179, 255, 252, 255);
+    static Color fleeColor = new Color32(242, 255, 73, 255);
 
     [Range(0, 1)]
     public float gatherThreshold;
@@ -55,6 +60,7 @@ public class Animal : MonoBehaviour
 
     public float gatherSightRadius;
     public float reproductionSightRadius;
+    public float fleeSightRadius;
 
     float timeCanReproduceAfter;
     public float reproduceCooldown;
@@ -64,13 +70,16 @@ public class Animal : MonoBehaviour
 
     public Material visionRadiusMaterial;
 
+    GameObject m_sightRing;
+
     void AddSightRadius()
     {
-        var circle = new GameObject { name = "Planning Radius" };
-        circle.transform.parent = transform;
-        circle.transform.localPosition = Vector3.zero;
-        circle.DrawCircle(gatherSightRadius, .1f);
-        circle.GetComponent<LineRenderer>().material = visionRadiusMaterial;
+        Debug.Assert(m_sightRing == null);
+        m_sightRing = new GameObject { name = "Planning Radius" };
+        m_sightRing.transform.parent = transform;
+        m_sightRing.transform.localPosition = Vector3.zero;
+        m_sightRing.DrawCircle(gatherSightRadius, .1f);
+        m_sightRing.GetComponent<LineRenderer>().material = visionRadiusMaterial;
     }
 
     protected void OnStart(AnimalConfig config)
@@ -80,9 +89,22 @@ public class Animal : MonoBehaviour
         m_fullness = 0.5f + Random.value * 0.5f;
         m_renderer = GetComponent<Renderer>();
         m_fullColor = m_renderer.material.color;
-        // AddSightRadius();
         timeCanReproduceAfter = Time.time + reproduceCooldown;
         StartCoroutine(PlanLoop());
+    }
+
+    public void ShowOrHideSightRadius()
+    {
+        if (User.showSightRings && m_sightRing == null)
+        {
+            AddSightRadius();
+        }
+
+        if (!User.showSightRings)
+        {
+            Destroy(m_sightRing);
+            m_sightRing = null;
+        }
     }
 
     public GameObject FindNearestVisibleObjectWithTag(string tag, float radius)
@@ -129,7 +151,18 @@ public class Animal : MonoBehaviour
         //     Debug.Break();
         // }
 
-        if (m_fullness < gatherThreshold)
+        GameObject nearbyThreat = null;
+        if (m_config.fleeFromTag != null)
+        {
+            nearbyThreat = FindNearestVisibleObjectWithTag(m_config.fleeFromTag, fleeSightRadius);
+        }
+
+        if (nearbyThreat != null)
+        {
+            m_targetObject = nearbyThreat;
+            m_plan = Objective.Flee;
+        }
+        else if (m_fullness < gatherThreshold)
         {
             m_plan = Objective.Gather;
             m_targetObject = FindNearestVisibleObjectWithTag(m_config.foodTag, gatherSightRadius);
@@ -183,6 +216,7 @@ public class Animal : MonoBehaviour
         return false;
     }
 
+
     void DoGatherUpdate()
     {
         planningIndicator.material.color = gatherColor;
@@ -218,6 +252,19 @@ public class Animal : MonoBehaviour
         }
     }
 
+    void DoFleeUpdate()
+    {
+        planningIndicator.material.color = fleeColor;
+
+        // Flee the target object.
+        if (m_targetObject == null) return;
+
+        // Simply run in the opposite direction of the closest flee thing.
+        transform.LookAt(NormalizeToCurrentHeight(m_targetObject.transform.position));
+        transform.Rotate(0, 180, 0);
+        transform.Translate(Vector3.forward * fleeSpeed * Time.deltaTime);
+    }
+
     void AdjustFullness(float delta)
     {
         m_fullness += delta;
@@ -251,6 +298,9 @@ public class Animal : MonoBehaviour
                 break;
             case Objective.Reproduce:
                 DoReproduceUpdate();
+                break;
+            case Objective.Flee:
+                DoFleeUpdate();
                 break;
         }
 
