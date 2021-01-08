@@ -68,9 +68,14 @@ public class Spawner : MonoBehaviour
         foodCount++;
     }
 
+    // FIXME: Figure out where this should actually live.
     Evolvable MergeTraits(Evolvable traits1, Evolvable traits2)
     {
-        return traits1;
+        Evolvable newTraits = new Evolvable();
+        newTraits.gatherSpeed = (traits1.gatherSpeed + traits2.gatherSpeed) / 2.0f;
+        // MUTATE
+        newTraits.gatherSpeed += (Random.value - 0.5f);
+        return newTraits;
     }
 
     void PredatorReproduced(GameObject parent1, GameObject parent2)

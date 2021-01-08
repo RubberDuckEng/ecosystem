@@ -15,6 +15,13 @@ public class HUD : MonoBehaviour
         int plantCount = GameObject.FindGameObjectsWithTag("Plant").Length;
         int predatorCount = GameObject.FindGameObjectsWithTag("Predator").Length;
 
-        countText.text = $"Predators: {predatorCount}\nPrey: {preyCount}\nPlants: {plantCount}";
+        float gatherSpeedSum = 0;
+        foreach (var prey in FindObjectsOfType<Prey>())
+        {
+            gatherSpeedSum += prey.traits.gatherSpeed;
+        }
+        float averageGatherSpeed = gatherSpeedSum / preyCount;
+
+        countText.text = $"Predators: {predatorCount}\nPrey: {preyCount} (speed: {averageGatherSpeed})\nPlants: {plantCount}";
     }
 }
