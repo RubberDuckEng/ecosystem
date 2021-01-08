@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 enum Objective
 {
@@ -18,9 +19,16 @@ public class AnimalConfig
     public string fleeFromTag;
 }
 
+[System.Serializable]
+public class Evolvable
+{
+    public float gatherSpeed;
+}
+
+[RequireComponent(typeof(NavMeshAgent))]
 public class Animal : MonoBehaviour
 {
-    public event System.Action<GameObject> OnReproduce;
+    public event System.Action<GameObject, GameObject> OnReproduce;
 
     GameObject m_targetObject;
     Vector3 m_targetLocation;
@@ -30,7 +38,7 @@ public class Animal : MonoBehaviour
 
     int planUpdatesPerSecond = 2;
 
-    public float gatherSpeed;
+    public Evolvable traits;
     public float wanderSpeed;
     public float reproduceSpeed;
     public float fleeSpeed;
@@ -212,7 +220,7 @@ public class Animal : MonoBehaviour
             return true;
         }
         transform.LookAt(NormalizeToCurrentHeight(m_targetObject.transform.position));
-        transform.Translate(Vector3.forward * gatherSpeed * Time.deltaTime);
+        transform.Translate(Vector3.forward * traits.gatherSpeed * Time.deltaTime);
         return false;
     }
 
@@ -244,11 +252,12 @@ public class Animal : MonoBehaviour
         {
             AdjustFullness(-reproduceCost);
             timeCanReproduceAfter = Time.time + reproduceCooldown;
-            PlanOnce();
             if (OnReproduce != null)
             {
-                OnReproduce(gameObject);
+                OnReproduce(gameObject, m_targetObject);
             }
+            // Plan after reproducing so we don't change m_targetObject.
+            PlanOnce();
         }
     }
 
@@ -261,7 +270,7 @@ public class Animal : MonoBehaviour
 
         // Simply run in the opposite direction of the closest flee thing.
         transform.LookAt(NormalizeToCurrentHeight(m_targetObject.transform.position));
-        transform.Rotate(0, 180, 0);
+        transform.Rotate(Vector3.up * 180);
         transform.Translate(Vector3.forward * fleeSpeed * Time.deltaTime);
     }
 

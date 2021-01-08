@@ -22,6 +22,9 @@ public class Spawner : MonoBehaviour
 
     public float foodPerSecond = 1; // per second;
 
+    public Evolvable initialPreyTraits;
+    public Evolvable initialPredatorTraits;
+
     int foodCount;
     int foodLimit;
     float nextFoodSpawn;
@@ -29,27 +32,31 @@ public class Spawner : MonoBehaviour
     void SpawnPreyAtRandomLocation()
     {
         Vector3 location = new Vector3(Random.value * mapSize - .5f * mapSize, 0, Random.value * mapSize - .5f * mapSize);
-        SpawnPrey(location);
+        SpawnPrey(location, initialPreyTraits);
     }
 
-    void SpawnPrey(Vector3 location)
+    void SpawnPrey(Vector3 location, Evolvable traits)
     {
-        var prey = Instantiate<GameObject>(preyPrefab, location, Quaternion.identity);
-        prey.transform.parent = transform;
-        prey.GetComponent<Prey>().OnReproduce += PreyReproduced;
+        var go = Instantiate<GameObject>(preyPrefab, location, Quaternion.identity);
+        go.transform.parent = transform;
+        var animal = go.GetComponent<Animal>();
+        animal.traits = traits;
+        animal.OnReproduce += PreyReproduced;
     }
 
     void SpawnPredatorAtRandomLocation()
     {
         Vector3 location = new Vector3(Random.value * mapSize - .5f * mapSize, 0, Random.value * mapSize - .5f * mapSize);
-        SpawnPredator(location);
+        SpawnPredator(location, initialPredatorTraits);
     }
 
-    void SpawnPredator(Vector3 location)
+    void SpawnPredator(Vector3 location, Evolvable traits)
     {
-        var predator = Instantiate<GameObject>(predatorPrefab, location, Quaternion.identity);
-        predator.transform.parent = transform;
-        predator.GetComponent<Predator>().OnReproduce += PredatorReproduced;
+        var go = Instantiate<GameObject>(predatorPrefab, location, Quaternion.identity);
+        go.transform.parent = transform;
+        var animal = go.GetComponent<Animal>();
+        animal.traits = traits;
+        animal.OnReproduce += PredatorReproduced;
     }
 
     void SpawnFoodAtRandomLocation()
@@ -61,14 +68,23 @@ public class Spawner : MonoBehaviour
         foodCount++;
     }
 
-    void PredatorReproduced(GameObject parent)
+    Evolvable MergeTraits(Evolvable traits1, Evolvable traits2)
     {
-        SpawnPredator(parent.transform.position);
+        return traits1;
     }
 
-    void PreyReproduced(GameObject parent)
+    void PredatorReproduced(GameObject parent1, GameObject parent2)
     {
-        SpawnPrey(parent.transform.position);
+        Animal animal1 = parent1.GetComponent<Animal>();
+        Animal animal2 = parent2.GetComponent<Animal>();
+        SpawnPredator(parent1.transform.position, MergeTraits(animal1.traits, animal2.traits));
+    }
+
+    void PreyReproduced(GameObject parent1, GameObject parent2)
+    {
+        Animal animal1 = parent1.GetComponent<Animal>();
+        Animal animal2 = parent2.GetComponent<Animal>();
+        SpawnPrey(parent1.transform.position, MergeTraits(animal1.traits, animal2.traits));
     }
 
     void PlantDied()

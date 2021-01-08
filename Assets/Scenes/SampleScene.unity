@@ -833,6 +833,10 @@ MonoBehaviour:
   initialFoodDensity: 0.02
   maxFoodDensity: 0.1
   foodPerSecond: 6
+  initialPreyTraits:
+    gatherSpeed: 4
+  initialPredatorTraits:
+    gatherSpeed: 2
 --- !u!4 &1071379058
 Transform:
   m_ObjectHideFlags: 0
