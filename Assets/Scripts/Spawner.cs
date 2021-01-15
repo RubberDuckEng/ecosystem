@@ -25,7 +25,6 @@ public class Spawner : MonoBehaviour
     public Evolvable initialPreyTraits;
     public Evolvable initialPredatorTraits;
 
-    int foodCount;
     int foodLimit;
     float nextFoodSpawn;
 
@@ -64,8 +63,6 @@ public class Spawner : MonoBehaviour
         Vector3 location = new Vector3(Random.value * mapSize - .5f * mapSize, 0, Random.value * mapSize - .5f * mapSize);
         var food = Instantiate<GameObject>(foodPrefab, location, Quaternion.identity);
         food.transform.parent = transform;
-        food.GetComponent<Edible>().OnDeath += PlantDied;
-        foodCount++;
     }
 
     // FIXME: Figure out where this should actually live.
@@ -90,11 +87,6 @@ public class Spawner : MonoBehaviour
         Animal animal1 = parent1.GetComponent<Animal>();
         Animal animal2 = parent2.GetComponent<Animal>();
         SpawnPrey(parent1.transform.position, MergeTraits(animal1.traits, animal2.traits));
-    }
-
-    void PlantDied()
-    {
-        foodCount--;
     }
 
     int CountFromDensity(float density)
@@ -123,9 +115,14 @@ public class Spawner : MonoBehaviour
         }
     }
 
+    int CountLivePlants()
+    {
+        return GameObject.FindGameObjectsWithTag("Plant").Length;
+    }
+
     void Update()
     {
-        if (nextFoodSpawn < Time.time && foodCount < foodLimit)
+        if (nextFoodSpawn < Time.time && CountLivePlants() < foodLimit)
         {
             SpawnFoodAtRandomLocation();
             float timeBetweenSpawns = 1f / foodPerSecond;
