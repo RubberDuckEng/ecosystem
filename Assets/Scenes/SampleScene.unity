@@ -829,14 +829,14 @@ MonoBehaviour:
   predatorPrefab: {fileID: 4990712646858229786, guid: 8b2d6a26224f5cb4ba24155bf1f1c2da,
     type: 3}
   initialPrey: 80
-  initialPredators: 20
-  initialFoodDensity: 0.02
+  initialPredators: 0
+  initialFoodDensity: 0
   maxFoodDensity: 0.1
   foodPerSecond: 6
   initialPreyTraits:
-    gatherSpeed: 4
+    speed: 4
   initialPredatorTraits:
-    gatherSpeed: 2
+    speed: 2
 --- !u!4 &1071379058
 Transform:
   m_ObjectHideFlags: 0

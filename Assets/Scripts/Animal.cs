@@ -19,10 +19,80 @@ public class AnimalConfig
     public string fleeFromTag;
 }
 
+public class EvolvableStats
+{
+    int _count;
+    Evolvable sum = new Evolvable();
+    Evolvable average;
+
+    public int Length
+    {
+        get
+        {
+            return _count;
+        }
+    }
+
+    public void Add(Evolvable next)
+    {
+        _count += 1;
+        sum.speed += next.speed;
+        sum.wanderSpeedMultipler += next.wanderSpeedMultipler;
+    }
+
+    public Evolvable Average()
+    {
+        if (average == null)
+        {
+            average = new Evolvable();
+            float count = (float)_count;
+
+            average.speed = sum.speed / count;
+            average.wanderSpeedMultipler = sum.wanderSpeedMultipler / count;
+        }
+        return average;
+    }
+}
+
 [System.Serializable]
 public class Evolvable
 {
-    public float gatherSpeed;
+    public float speed;
+    public float wanderSpeedMultipler;
+
+    float MergeFloat(float one, float two, float mutationRate)
+    {
+        float averageValue = one + two / 2.0f;
+        // FIXME: Hack to avoid stagnating at 0;
+        float mutationScale = averageValue;
+        if (Mathf.Abs(mutationScale) < 0.1f)
+        {
+            mutationScale = Mathf.Sign(mutationScale) * 0.1f;
+        }
+        // Scale mutation based on average value to make it a % not absolute.
+        float mutation = (Random.value - 0.5f) * mutationRate * mutationScale;
+        // NOTE: This can go negative, not clear if that's good.
+        return averageValue + mutation;
+    }
+
+    public
+    Evolvable MergeWith(Evolvable other)
+    {
+        Evolvable newTraits = new Evolvable();
+        float mutationRate = 1f / 2f;
+        newTraits.speed = MergeFloat(speed, other.speed, mutationRate);
+        newTraits.wanderSpeedMultipler = MergeFloat(wanderSpeedMultipler, other.wanderSpeedMultipler, mutationRate);
+        return newTraits;
+    }
+
+    public string ToDebugString()
+    {
+        string s = "";
+        s += $"speed: {speed:f1}";
+        s += $", wanderSpeedMultipler: {wanderSpeedMultipler:f3}";
+        return s;
+    }
+
 }
 
 [RequireComponent(typeof(NavMeshAgent))]
@@ -39,9 +109,6 @@ public class Animal : MonoBehaviour
     int planUpdatesPerSecond = 2;
 
     public Evolvable traits;
-    public float wanderSpeed;
-    public float reproduceSpeed;
-    public float fleeSpeed;
 
     public float reachDistance;
     [Range(0, 0.1f)]
@@ -193,6 +260,7 @@ public class Animal : MonoBehaviour
             // If we're less than 1s away from our destination, we can change our minds.
             if (distance < reachDistance || !planWasWander)
             {
+                float wanderSpeed = traits.wanderSpeedMultipler * traits.speed;
                 m_targetLocation = NormalizeToCurrentHeight(transform.position + Random.onUnitSphere * wanderSpeed * wanderingness);
             }
             m_plan = Objective.Wander;
@@ -220,7 +288,7 @@ public class Animal : MonoBehaviour
             return true;
         }
         transform.LookAt(NormalizeToCurrentHeight(m_targetObject.transform.position));
-        transform.Translate(Vector3.forward * traits.gatherSpeed * Time.deltaTime);
+        transform.Translate(Vector3.forward * traits.speed * Time.deltaTime);
         return false;
     }
 
@@ -242,7 +310,7 @@ public class Animal : MonoBehaviour
         Debug.DrawRay(transform.position, m_targetLocation - transform.position);
         planningIndicator.material.color = wanderColor;
         transform.LookAt(m_targetLocation);
-        transform.Translate(Vector3.forward * wanderSpeed * Time.deltaTime);
+        transform.Translate(Vector3.forward * traits.speed * Time.deltaTime);
     }
 
     void DoReproduceUpdate()
@@ -271,7 +339,7 @@ public class Animal : MonoBehaviour
         // Simply run in the opposite direction of the closest flee thing.
         transform.LookAt(NormalizeToCurrentHeight(m_targetObject.transform.position));
         transform.Rotate(Vector3.up * 180);
-        transform.Translate(Vector3.forward * fleeSpeed * Time.deltaTime);
+        transform.Translate(Vector3.forward * traits.speed * Time.deltaTime);
     }
 
     void AdjustFullness(float delta)
@@ -287,7 +355,8 @@ public class Animal : MonoBehaviour
 
     protected void OnUpdate()
     {
-        AdjustFullness(-metabolism * Time.deltaTime);
+        float foodConsumed = -metabolism * traits.speed;
+        AdjustFullness(foodConsumed * Time.deltaTime);
         // Only start lerping once below gather threshold.
         m_renderer.material.color = Color.Lerp(m_deadColor, m_fullColor, m_fullness / gatherThreshold);
 

@@ -7,21 +7,31 @@ public class HUD : MonoBehaviour
 {
     public Text countText;
 
+    EvolvableStats GatherStatsFrom(GameObject[] gos)
+    {
+        EvolvableStats stats = new EvolvableStats();
+        foreach (var go in gos)
+        {
+            stats.Add(go.GetComponent<Animal>().traits);
+        }
+        return stats;
+    }
+
     void Update()
     {
         // FIXME: There is probably a more efficient way to get these counts
         // or perhaps we should update this less frequently than once per frame.
-        int preyCount = GameObject.FindGameObjectsWithTag("Prey").Length;
         int plantCount = GameObject.FindGameObjectsWithTag("Plant").Length;
-        int predatorCount = GameObject.FindGameObjectsWithTag("Predator").Length;
 
-        float gatherSpeedSum = 0;
-        foreach (var prey in FindObjectsOfType<Prey>())
-        {
-            gatherSpeedSum += prey.traits.gatherSpeed;
-        }
-        float averageGatherSpeed = gatherSpeedSum / preyCount;
+        EvolvableStats prey = GatherStatsFrom(GameObject.FindGameObjectsWithTag("Prey"));
+        Evolvable avgPrey = prey.Average();
 
-        countText.text = $"Predators: {predatorCount}\nPrey: {preyCount} (speed: {averageGatherSpeed})\nPlants: {plantCount}";
+        EvolvableStats predators = GatherStatsFrom(GameObject.FindGameObjectsWithTag("Predator"));
+        Evolvable avgPredator = predators.Average();
+
+        countText.text = $"Predators: {predators.Length} ({avgPredator.ToDebugString()})";
+        countText.text += $"\nPrey: {prey.Length} ({avgPrey.ToDebugString()})";
+        countText.text += $"\nPlants: {plantCount}";
     }
+
 }

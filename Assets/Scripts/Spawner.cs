@@ -65,28 +65,18 @@ public class Spawner : MonoBehaviour
         food.transform.parent = transform;
     }
 
-    // FIXME: Figure out where this should actually live.
-    Evolvable MergeTraits(Evolvable traits1, Evolvable traits2)
-    {
-        Evolvable newTraits = new Evolvable();
-        newTraits.gatherSpeed = (traits1.gatherSpeed + traits2.gatherSpeed) / 2.0f;
-        // MUTATE
-        newTraits.gatherSpeed += (Random.value - 0.5f);
-        return newTraits;
-    }
-
     void PredatorReproduced(GameObject parent1, GameObject parent2)
     {
         Animal animal1 = parent1.GetComponent<Animal>();
         Animal animal2 = parent2.GetComponent<Animal>();
-        SpawnPredator(parent1.transform.position, MergeTraits(animal1.traits, animal2.traits));
+        SpawnPredator(parent1.transform.position, animal1.traits.MergeWith(animal2.traits));
     }
 
     void PreyReproduced(GameObject parent1, GameObject parent2)
     {
         Animal animal1 = parent1.GetComponent<Animal>();
         Animal animal2 = parent2.GetComponent<Animal>();
-        SpawnPrey(parent1.transform.position, MergeTraits(animal1.traits, animal2.traits));
+        SpawnPrey(parent1.transform.position, animal1.traits.MergeWith(animal2.traits));
     }
 
     int CountFromDensity(float density)
