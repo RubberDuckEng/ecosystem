@@ -14,6 +14,15 @@ public class Keyboard : MonoBehaviour
         {
             Time.timeScale *= .5f;
         }
+        else if (Input.GetKeyDown(KeyCode.I))
+        {
+            // Maximum value during editing.
+            Time.timeScale = 100f;
+        }
+        else if (Input.GetKeyDown(KeyCode.N))
+        {
+            Time.timeScale = 1f;
+        }
 
         if (Input.GetKeyDown(KeyCode.M))
         {
